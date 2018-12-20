@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HRM"
         x:Name="window" x:Class="HRM.DepartmentWindow"
         mc:Ignorable="d"
-        Title="Отдел" Height="136.066" Width="400.467" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
+        Title="Отдел:" Height="136.066" Width="400.467" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
     <Grid>
         <TextBox x:Name="tbName" Margin="10,20,10,54" TextWrapping="Wrap" Text="{Binding Name}"/>
         <Button x:Name="btSave" Content="Сохранить" HorizontalAlignment="Left" Margin="10,0,0,16" VerticalAlignment="Bottom" Width="75" Click="BtSave_Click"/>
