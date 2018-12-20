@@ -1,0 +1,40 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HRM"
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="HRM.MainWindow"
+        mc:Ignorable="d"
+        Title="HRM" Height="450" Width="800" VerticalAlignment="Center" HorizontalAlignment="Center" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40*"/>
+            <ColumnDefinition Width="60*"/>
+        </Grid.ColumnDefinitions>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top" Width="5"/>
+        <ListView x:Name="DeptList" Margin="10,41,10,37" SelectionMode="Single" MouseDoubleClick="DeptList_MouseDoubleClick" SelectionChanged="DeptList_SelectionChanged">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding Name}" Width="200"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button x:Name="btDeptNew" Content="Создать новый" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" MinWidth="100" Click="BtnDeptNew_Click"/>
+        <Button x:Name="btDeptEdit" Content="Редактирование" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Click="BtDeptEdit_Click" MinWidth="100"/>
+        <Label Content="Список отделов:" Margin="10,10,10,0" VerticalAlignment="Top" Width="297"/>
+        <ListView x:Name="EmployeesList" Grid.Column="1" Margin="10,41,10,37" MouseDoubleClick="EmployeesList_MouseDoubleClick">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding LastName}" Header="Фамилия" Width="190"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Имя" Width="120"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Department.Name}" Header="Отдел" Width="130"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Label Content="Сотрудники:" Grid.Column="1" Margin="10,10,10,0" VerticalAlignment="Top"/>
+        <Button x:Name="btEmplNew" Content="Создать новый" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" MinWidth="100" Click="BtEmplNew_Click"/>
+        <Button x:Name="btEmplEdit" Content="Редактирование" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" MinWidth="100" Click="BtEmplEdit_Click"/>
+
+    </Grid>
+</Window>
