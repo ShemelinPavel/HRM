@@ -30,7 +30,7 @@ namespace HRM
 
             DataLayer.Init();
 
-            DeptList.ItemsSource = Department.Departments;
+            DeptList.DataContext = Department.Departments;
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace HRM
         {
             DepartmentWindow win = new DepartmentWindow( ref d ) { Owner = this };
             win.Closed += Department_Edit_WindowClosed;
-            win.Show();
+            win.ShowDialog();
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace HRM
         {
             EmployeeWindow win = new EmployeeWindow( ref e ) { Owner = this };
             win.Closed += Employee_Edit_WindowClosed;
-            win.Show();
+            win.ShowDialog();
         }
 
 
@@ -186,10 +186,34 @@ namespace HRM
         {
             Department d = (Department)DeptList.SelectedItem;
 
+            if (d != null) EmployeesList.DataContext = Employee.Employees.Where( x => x.Department == d );
+            else EmployeesList.DataContext = null;
+        }
+
+        private void BtDeptDel_Click( object sender, RoutedEventArgs e )
+        {
+
+            Department d = (Department)DeptList.SelectedItem;
+            int dIndex = Department.Departments.IndexOf( d );
+
             if (d != null)
             {
-                // формируем список сотрудников относящихся к данному подразделению
-                EmployeesList.ItemsSource = Employee.Employees.Where( x => x.Department == d );
+                int emplCount = Employee.Employees.Count( x => x.Department == d );
+
+                if (emplCount != 0)
+                {
+                    string t = ( emplCount == 1 ) ? "сотрудника" : "сотрудников";
+                    MessageBoxResult userAns = MessageBox.Show( this, $"Данный отдел указан у {emplCount} {t}.\nУдаление отдела приведет к удалению данных сотрудников.\nПродолжить удаление?", "Предупреждение", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes );
+
+                    if (userAns == MessageBoxResult.No)
+                    {
+                        return;
+                    }
+                }
+                DataLayer.DepartmentCascadeDelete( ref d );
+
+                if (DeptList.Items.Count - 1 < dIndex) dIndex--;
+                if (dIndex >= 0)DeptList.SelectedItem = DeptList.Items[dIndex];
             }
         }
     }
