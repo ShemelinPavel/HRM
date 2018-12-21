@@ -25,7 +25,7 @@ namespace HRM
         /// </summary>
         static void EmplLoad()
         {
-            new Employee("Иванов", "Иван", Guid.Parse("D772844B-07DC-4DC1-B4BC-D168699BB0B4"));
+            new Employee( "Иванов", "Иван", Guid.Parse( "D772844B-07DC-4DC1-B4BC-D168699BB0B4" ) );
             new Employee( "Сидоров", "Сидор", Guid.Parse( "D772844B-07DC-4DC1-B4BC-D168699BB0B4" ) );
             new Employee( "Петров", "Петр", Guid.Parse( "50D15AB8-9A12-4AA0-8FBF-BF3EE662F0D6" ) );
             new Employee( "Кузин", "Юрий", Guid.Parse( "94CD5301-BD0A-4BBF-BF33-1A9DCC2F3D3E" ) );
@@ -39,6 +39,16 @@ namespace HRM
         {
             DataLayer.DeptsLoad();
             DataLayer.EmplLoad();
+        }
+
+        public static void DepartmentCascadeDelete( ref Department d )
+        {
+            for (int i = Employee.Employees.Count - 1; i >= 0; i--)
+            {
+                if (Employee.Employees[i].Department == d) Employee.Employees.RemoveAt( i );
+            }
+
+            Department.Departments.Remove( d );
         }
     }
 }
