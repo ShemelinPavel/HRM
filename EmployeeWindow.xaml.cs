@@ -39,10 +39,9 @@ namespace HRM
 
             CurrentEmployee = em;
 
-            cbDepartment.ItemsSource = Department.Departments;
-            cbDepartment.SelectedItem = CurrentEmployee?.Department;
-
             this.DataContext = CurrentEmployee;
+            cbDepartment.DataContext = Department.Departments;
+            cbDepartment.SelectedItem = CurrentEmployee?.Department;
         }
 
         /// <summary>
