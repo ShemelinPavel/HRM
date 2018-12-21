@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace HRM
 {
@@ -8,8 +9,13 @@ namespace HRM
     /// <summary>
     /// Сотрудник
     /// </summary>
-    public class Employee
+    public class Employee : INotifyPropertyChanged
     {
+        /// <summary>
+        /// событие - реализация интерфейса INotifyPropertyChanged
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
         /// <summary>
         /// коллекция всех объектов Сотрудник
         /// </summary>
@@ -46,7 +52,12 @@ namespace HRM
         public string LastName
         {
             get { return this.lname; }
-            set { this.lname = value; }
+            set
+            {
+                this.lname = value;
+
+                if(this.PropertyChanged != null) this.PropertyChanged( this, new PropertyChangedEventArgs( nameof(this.LastName ) ) );
+            }
         }
 
         /// <summary>
@@ -55,7 +66,12 @@ namespace HRM
         public string Name
         {
             get { return this.name; }
-            set { this.name = value; }
+            set
+            {
+                this.name = value;
+
+                if (this.PropertyChanged != null) this.PropertyChanged( this, new PropertyChangedEventArgs( nameof( this.Name ) ) );
+            }
         }
 
         /// <summary>
@@ -72,7 +88,12 @@ namespace HRM
         public Department Department
         {
             get { return this.dept; }
-            set { this.dept = value; }
+            set
+            {
+                this.dept = value;
+
+                if (this.PropertyChanged != null) this.PropertyChanged( this, new PropertyChangedEventArgs( nameof( this.Department ) ) );
+            }
         }
 
         /// <summary>
@@ -80,7 +101,7 @@ namespace HRM
         /// </summary>
         /// <param name="lname">Фамилия</param>
         /// <param name="name">Имя</param>
-        public Employee( string lname, string name) : this(lname, name, Guid.Empty, Guid.Empty )
+        public Employee( string lname, string name ) : this( lname, name, Guid.Empty, Guid.Empty )
         {
         }
 
@@ -90,7 +111,7 @@ namespace HRM
         /// <param name="lname">Фамилия</param>
         /// <param name="name">Имя</param>
         /// <param name="deptGuid">Гуид объекта Отдел</param>
-        public Employee( string lname, string name, Guid deptGuid): this( lname, name, deptGuid, Guid.Empty )
+        public Employee( string lname, string name, Guid deptGuid ) : this( lname, name, deptGuid, Guid.Empty )
         {
         }
 
@@ -101,12 +122,12 @@ namespace HRM
         /// <param name="name">Имя</param>
         /// <param name="deptGuid">Гуид объекта Отдел</param>
         /// <param name="guid">Гуид объекта Сотрудник</param>
-        public Employee( string lname, string name, Guid deptGuid , Guid guid)
+        public Employee( string lname, string name, Guid deptGuid, Guid guid )
         {
             this.emplguid = ( guid == Guid.Empty ) ? Guid.NewGuid() : guid;
             LastName = lname;
             Name = name;
-            Department = (deptGuid == Guid.Empty) ? null: Department.GetDepartmentByGuid( deptGuid );
+            Department = ( deptGuid == Guid.Empty ) ? null : Department.GetDepartmentByGuid( deptGuid );
 
             //добавляем в общую коллекцию
             Employees.Add( this );
@@ -118,7 +139,7 @@ namespace HRM
         /// <returns>Строковое представление</returns>
         public override string ToString()
         {
-            return $"Сотрудник Фамилия:{LastName} Имя:{Name}";
+            return $"Сотрудник. Фамилия:{LastName} Имя:{Name}";
         }
     }
     #endregion Сотрудник
@@ -127,8 +148,13 @@ namespace HRM
     /// <summary>
     /// Отдел
     /// </summary>
-    public class Department
+    public class Department : INotifyPropertyChanged
     {
+        /// <summary>
+        /// событие - реализация интерфейса INotifyPropertyChanged
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
         /// <summary>
         /// коллекция всех объектов Отдел
         /// </summary>
@@ -155,7 +181,12 @@ namespace HRM
         public string Name
         {
             get { return this.name; }
-            set { this.name = value; }
+            set
+            {
+                this.name = value;
+
+                if(this.PropertyChanged != null) this.PropertyChanged( this, new PropertyChangedEventArgs( nameof( this.Name ) ) );
+            }
         }
 
         /// <summary>
@@ -211,7 +242,7 @@ namespace HRM
         /// <returns>Строковое представление</returns>
         public override string ToString()
         {
-            return Name;
+            return $"Отдел. Наименование: {Name}";
         }
     }
     #endregion Отдел
