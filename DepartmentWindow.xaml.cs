@@ -39,7 +39,6 @@ namespace HRM
 
             CurrentDepartment = dept;
 
-            //не получается почему-то привязать DataContext из свойств TexbBox
             tbName.DataContext = CurrentDepartment;
         }
 
