@@ -174,7 +174,17 @@ namespace HRM
             Employee em = (Employee)EmployeesList.SelectedItem;
 
             if (em != null) Employee_Edit_WindowOpen( ref em );
+        }
 
+        /// <summary>
+        /// обновление списка сотрудников
+        /// </summary>
+        public void EmployeesList_Refresh()
+        {
+            Department d = (Department)DeptList.SelectedItem;
+
+            if (d != null) EmployeesList.DataContext = Employee.Employees.Where( x => x.Department == d );
+            else EmployeesList.DataContext = null;
         }
 
         /// <summary>
@@ -184,17 +194,13 @@ namespace HRM
         /// <param name="e">параметры события</param>
         private void DeptList_SelectionChanged( object sender, SelectionChangedEventArgs e )
         {
-            Department d = (Department)DeptList.SelectedItem;
-
-            if (d != null) EmployeesList.DataContext = Employee.Employees.Where( x => x.Department == d );
-            else EmployeesList.DataContext = null;
+            EmployeesList_Refresh();
         }
 
         private void BtDeptDel_Click( object sender, RoutedEventArgs e )
         {
-
             Department d = (Department)DeptList.SelectedItem;
-            int dIndex = Department.Departments.IndexOf( d );
+            int dIndex = DeptList.Items.IndexOf( d );
 
             if (d != null)
             {
@@ -203,7 +209,7 @@ namespace HRM
                 if (emplCount != 0)
                 {
                     string t = ( emplCount == 1 ) ? "сотрудника" : "сотрудников";
-                    MessageBoxResult userAns = MessageBox.Show( this, $"Данный отдел указан у {emplCount} {t}.\nУдаление отдела приведет к удалению данных сотрудников.\nПродолжить удаление?", "Предупреждение", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes );
+                    MessageBoxResult userAns = MessageBox.Show( this, $"Данный отдел <{d.Name}> указан у {emplCount} {t}.\nУдаление отдела приведет к удалению данных сотрудников.\nПродолжить удаление?", "Предупреждение", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes );
 
                     if (userAns == MessageBoxResult.No)
                     {
@@ -214,6 +220,21 @@ namespace HRM
 
                 if (DeptList.Items.Count - 1 < dIndex) dIndex--;
                 if (dIndex >= 0)DeptList.SelectedItem = DeptList.Items[dIndex];
+            }
+        }
+
+        private void BtEmplDel_Click( object sender, RoutedEventArgs e )
+        {
+            Employee em = (Employee)EmployeesList.SelectedItem;
+            int dIndex = EmployeesList.Items.IndexOf( em );
+
+            if (em != null)
+            {
+                DataLayer.EmployeeDelete( ref em );
+                EmployeesList_Refresh();
+
+                if (EmployeesList.Items.Count - 1 < dIndex) dIndex--;
+                if (dIndex >= 0) EmployeesList.SelectedItem = EmployeesList.Items[dIndex];
             }
         }
     }
