@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace HRM
 {
@@ -41,14 +42,30 @@ namespace HRM
             DataLayer.EmplLoad();
         }
 
+        /// <summary>
+        /// каскадное удаление объекта Отдел и объектов Сотрудник связанных с ним
+        /// </summary>
+        /// <param name="d">ссылка на Отдел</param>
         public static void DepartmentCascadeDelete( ref Department d )
         {
-            for (int i = Employee.Employees.Count - 1; i >= 0; i--)
+            Guid guid = d.DepartmentGuid;
+            Employee[] emplArray = Employee.Employees.Where( x => x.Department.DepartmentGuid == guid ).ToArray();
+
+            foreach (Employee item in emplArray)
             {
-                if (Employee.Employees[i].Department == d) Employee.Employees.RemoveAt( i );
+                Employee.Employees.Remove( item );
             }
 
             Department.Departments.Remove( d );
+        }
+
+        /// <summary>
+        /// удаление объекта Сотрудник из общей коллекци
+        /// </summary>
+        /// <param name="e">ссылка на Сотрудник</param>
+        public static void EmployeeDelete (ref Employee e)
+        {
+            Employee.Employees.Remove( e );
         }
     }
 }
