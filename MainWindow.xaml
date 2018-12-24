@@ -7,7 +7,7 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="HRM.MainWindow"
         mc:Ignorable="d"
         Title="HRM" Height="448.764" Width="865.522" VerticalAlignment="Center" HorizontalAlignment="Center" WindowStartupLocation="CenterScreen">
-    <Grid ShowGridLines="True">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="44*"/>
             <RowDefinition Height="331*"/>
@@ -20,10 +20,25 @@
         <ListView x:Name="DeptList" Margin="10" SelectionMode="Single" MouseDoubleClick="DeptList_MouseDoubleClick" SelectionChanged="DeptList_SelectionChanged" ItemsSource="{Binding Mode=OneWay}" Grid.Row="1" Padding="0">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding Name}" Width="Auto">
+                    <GridViewColumn Header="Наименование">
+                        <GridViewColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding}"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.HeaderTemplate>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox HorizontalAlignment="Stretch"/>
+                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Path=Name}"></TextBlock>
+                                </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -67,7 +82,7 @@
             </Grid.ColumnDefinitions>
             <Button x:Name="btEmplNew" Content="Создать новый" Margin="5" MinWidth="105" Click="BtEmplNew_Click"/>
             <Button x:Name="btEmplEdit" Content="Редактирование" Margin="5" Click="BtEmplEdit_Click" Grid.Column="1"/>
-            <Button x:Name="btEmplDel" Content="Удалить" Margin="5" Grid.Column="2"/>
+            <Button x:Name="btEmplDel" Content="Удалить" Margin="5" Grid.Column="2" Click="BtEmplDel_Click"/>
             <Border BorderBrush="Black" BorderThickness="1" Margin="1,0" Grid.ColumnSpan="3" CornerRadius="2">
             </Border>
         </Grid>
