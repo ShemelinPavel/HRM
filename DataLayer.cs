@@ -63,9 +63,47 @@ namespace HRM
         /// удаление объекта Сотрудник из общей коллекци
         /// </summary>
         /// <param name="e">ссылка на Сотрудник</param>
-        public static void EmployeeDelete (ref Employee e)
+        public static void EmployeeDelete( ref Employee e )
         {
             Employee.Employees.Remove( e );
         }
+
+        public static void Dept_CreateTable()
+        {
+
+//            GO
+//            CREATE TABLE[dbo].[Departments](
+            
+//                [Id]   UNIQUEIDENTIFIER NOT NULL,
+//    [Name] NCHAR(20)       NOT NULL,
+//   PRIMARY KEY CLUSTERED( [Id] ASC)
+//);
+
     }
+
+    public static void Emp_CreateTable()
+    {
+//        GO
+//CREATE TABLE[dbo].[Employyees]
+//(
+
+
+//   [Id] UNIQUEIDENTIFIER NOT NULL,
+//    [LasName] NCHAR(50)       NOT NULL,
+
+//[Name]         NCHAR(50)       NOT NULL,
+
+//[DepartmentId] UNIQUEIDENTIFIER NOT NULL,
+//    PRIMARY KEY CLUSTERED( [Id] ASC)
+//);
+
+
+//        GO
+//        ALTER TABLE[dbo].[Employyees]
+//    WITH NOCHECK
+//    ADD CONSTRAINT[DepartmentId] FOREIGN KEY( [Id]) REFERENCES[dbo].[Departments] ([Id]);
+
+
+    }
+}
 }
