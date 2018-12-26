@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Data.SqlClient;
+using System.Configuration;
+
 
 namespace HRM
 {
@@ -68,42 +71,99 @@ namespace HRM
             Employee.Employees.Remove( e );
         }
 
-        public static void Dept_CreateTable()
+        public static SqlConnection GetSqlConnection( out Exception except )
         {
+            ConnectionStringSettings settings = ConfigurationManager.ConnectionStrings["HRM"];
+            except = null;
 
-//            GO
-//            CREATE TABLE[dbo].[Departments](
-            
-//                [Id]   UNIQUEIDENTIFIER NOT NULL,
-//    [Name] NCHAR(20)       NOT NULL,
-//   PRIMARY KEY CLUSTERED( [Id] ASC)
-//);
+            SqlConnection sqlCon = null;
+            try
+            {
+                sqlCon = new SqlConnection( settings.ConnectionString );
 
+            }
+            catch (Exception ex)
+            {
+                except = ex;
+                sqlCon = null;
+            }
+
+            return sqlCon;
+        }
+
+        public static bool Dept_CreateTable( out Exception except )
+        {
+            using (SqlConnection sqlCon = GetSqlConnection( out Exception except_GetSqlConnection ))
+            {
+                if (sqlCon == null)
+                {
+                    except = except_GetSqlConnection;
+                    return false;
+                }
+                else
+                { 
+                    string createExp = @"CREATE TABLE[dbo].[Departments](
+                                    [Id]   UNIQUEIDENTIFIER NOT NULL,
+                                    [Name] NCHAR(20)       NOT NULL,
+                                    PRIMARY KEY CLUSTERED( [Id] ASC));";
+
+                    try
+                    {
+                        SqlCommand sqlCom = new SqlCommand( createExp, sqlCon );
+                        sqlCon.Open();
+                        int result = sqlCom.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        except = ex;
+                        return false;
+                    }
+
+                    except = null;
+                    return true;
+                }
+            }
+        }
+
+        public static bool Emp_CreateTable( out Exception except )
+        {
+            using (SqlConnection sqlCon = GetSqlConnection( out Exception except_GetSqlConnection ))
+            {
+                if (sqlCon == null)
+                {
+                    except = except_GetSqlConnection;
+                    return false;
+                }
+                else
+                {
+                    string createExp = @"CREATE TABLE[dbo].[Employyees]
+                                        (
+                                        [Id] UNIQUEIDENTIFIER NOT NULL,
+                                        [LasName] NCHAR(50)       NOT NULL,
+                                        [Name]         NCHAR(50)       NOT NULL,
+                                        [DepartmentId] UNIQUEIDENTIFIER NOT NULL,
+                                        PRIMARY KEY CLUSTERED( [Id] ASC)
+                                        );
+                                        ALTER TABLE[dbo].[Employyees]
+                                        WITH NOCHECK
+                                        ADD CONSTRAINT[DepartmentId] FOREIGN KEY( [Id]) REFERENCES[dbo].[Departments] ([Id]);";
+
+                    try
+                    {
+                        SqlCommand sqlCom = new SqlCommand( createExp, sqlCon );
+                        sqlCon.Open();
+                        int result = sqlCom.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        except = ex;
+                        return false;
+                    }
+
+                    except = null;
+                    return true;
+                }
+            }
+        }
     }
-
-    public static void Emp_CreateTable()
-    {
-//        GO
-//CREATE TABLE[dbo].[Employyees]
-//(
-
-
-//   [Id] UNIQUEIDENTIFIER NOT NULL,
-//    [LasName] NCHAR(50)       NOT NULL,
-
-//[Name]         NCHAR(50)       NOT NULL,
-
-//[DepartmentId] UNIQUEIDENTIFIER NOT NULL,
-//    PRIMARY KEY CLUSTERED( [Id] ASC)
-//);
-
-
-//        GO
-//        ALTER TABLE[dbo].[Employyees]
-//    WITH NOCHECK
-//    ADD CONSTRAINT[DepartmentId] FOREIGN KEY( [Id]) REFERENCES[dbo].[Departments] ([Id]);
-
-
-    }
-}
 }

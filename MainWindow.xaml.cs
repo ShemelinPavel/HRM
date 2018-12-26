@@ -237,5 +237,19 @@ namespace HRM
                 if (dIndex >= 0) EmployeesList.SelectedItem = EmployeesList.Items[dIndex];
             }
         }
+
+        private void Button_Click( object sender, RoutedEventArgs e )
+        {
+
+            bool res = DataLayer.Dept_CreateTable(out Exception ex);
+
+            if (!( res )) MessageBox.Show( ex.Message );
+
+            bool res1 = DataLayer.Emp_CreateTable( out Exception ex1 );
+
+            if (!( res1 )) MessageBox.Show( ex1.Message );
+
+
+        }
     }
 }
