@@ -27,10 +27,6 @@ namespace HRM
         public MainWindow()
         {
             InitializeComponent();
-
-            DataLayer.Init();
-
-            DeptList.DataContext = Department.Departments;
         }
 
         /// <summary>
@@ -177,24 +173,13 @@ namespace HRM
         }
 
         /// <summary>
-        /// обновление списка сотрудников
-        /// </summary>
-        public void EmployeesList_Refresh()
-        {
-            Department d = (Department)DeptList.SelectedItem;
-
-            if (d != null) EmployeesList.DataContext = Employee.Employees.Where( x => x.Department == d );
-            else EmployeesList.DataContext = null;
-        }
-
-        /// <summary>
         /// обработка события смена выбранной строки списка объектов Отдел
         /// </summary>
         /// <param name="sender">объект-поставщик события</param>
         /// <param name="e">параметры события</param>
         private void DeptList_SelectionChanged( object sender, SelectionChangedEventArgs e )
         {
-            EmployeesList_Refresh();
+            //EmployeesList_Refresh();
         }
 
         private void BtDeptDel_Click( object sender, RoutedEventArgs e )
@@ -231,7 +216,7 @@ namespace HRM
             if (em != null)
             {
                 DataLayer.EmployeeDelete( ref em );
-                EmployeesList_Refresh();
+                //EmployeesList_Refresh();
 
                 if (EmployeesList.Items.Count - 1 < dIndex) dIndex--;
                 if (dIndex >= 0) EmployeesList.SelectedItem = EmployeesList.Items[dIndex];
@@ -262,6 +247,11 @@ namespace HRM
 
             if ( ex1 != null ) MessageBox.Show( ex1.Message );
             else MessageBox.Show( "Заполнена таблица Employees" );
+        }
+
+        private void Window_Loaded( object sender, RoutedEventArgs e )
+        {
+            DeptList.DataContext = DataLayer.GetDataTable_Dept( out Exception ex )?.DefaultView;
         }
     }
 }

@@ -266,5 +266,29 @@ namespace HRM
                 }
             }
         }
+
+        public static DataTable GetDataTable_Dept( out Exception except )
+        {
+            using (SqlConnection sqlCon = GetSqlConnection( out Exception except_GetSqlConnection ))
+            {
+
+                if (sqlCon == null)
+                {
+                    except = except_GetSqlConnection;
+                    return null;
+                }
+                else
+                {
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    SqlCommand command = new SqlCommand( "SELECT ID, Name FROM Departments", sqlCon );
+                    adapter.SelectCommand = command;
+                    DataTable dt = new DataTable();
+                    adapter.Fill( dt );
+
+                    except = null;
+                    return dt;
+                }
+            }
+        }
     }
 }

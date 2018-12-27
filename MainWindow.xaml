@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HRM"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="HRM.MainWindow"
         mc:Ignorable="d"
-        Title="HRM" Height="448.764" Width="865.522" VerticalAlignment="Center" HorizontalAlignment="Center" WindowStartupLocation="CenterScreen">
+        Title="HRM" Height="448.764" Width="865.522" VerticalAlignment="Center" HorizontalAlignment="Center" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="44*"/>
