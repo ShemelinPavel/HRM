@@ -219,7 +219,7 @@ namespace HRM
                 DataLayer.DepartmentCascadeDelete( ref d );
 
                 if (DeptList.Items.Count - 1 < dIndex) dIndex--;
-                if (dIndex >= 0)DeptList.SelectedItem = DeptList.Items[dIndex];
+                if (dIndex >= 0) DeptList.SelectedItem = DeptList.Items[dIndex];
             }
         }
 
@@ -238,18 +238,30 @@ namespace HRM
             }
         }
 
-        private void Button_Click( object sender, RoutedEventArgs e )
+        private void btCreateBaseTables_Click( object sender, RoutedEventArgs e )
         {
+            DataLayer.Dept_CreateTable( out Exception ex );
 
-            bool res = DataLayer.Dept_CreateTable(out Exception ex);
+            if ( ex != null ) MessageBox.Show( ex.Message );
+            else MessageBox.Show( "Создана таблица Departments" );
 
-            if (!( res )) MessageBox.Show( ex.Message );
+            DataLayer.Emp_CreateTable( out Exception ex1 );
 
-            bool res1 = DataLayer.Emp_CreateTable( out Exception ex1 );
+            if ( ex1 != null ) MessageBox.Show( ex1.Message );
+            else MessageBox.Show( "Создана таблица Employees" );
+        }
 
-            if (!( res1 )) MessageBox.Show( ex1.Message );
+        private void btFillDemoBase_Click( object sender, RoutedEventArgs e )
+        {
+            DataLayer.Dept_InsertDemoData( out Exception ex );
 
+            if ( ex != null) MessageBox.Show( ex.Message );
+            else MessageBox.Show( "Заполнена таблица Departments" );
 
+            DataLayer.Empl_InsertDemoData( out Exception ex1 );
+
+            if ( ex1 != null ) MessageBox.Show( ex1.Message );
+            else MessageBox.Show( "Заполнена таблица Employees" );
         }
     }
 }

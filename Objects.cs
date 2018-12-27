@@ -24,7 +24,7 @@ namespace HRM
         /// <summary>
         /// Гуид объекта Сотрудник
         /// </summary>
-        private Guid emplguid;
+        private Guid id;
 
         /// <summary>
         /// Фамилия объекта Сотрудник
@@ -44,7 +44,7 @@ namespace HRM
         /// <summary>
         /// Гуид объекта Сотрудник
         /// </summary>
-        public Guid EmployeeGuid => this.emplguid;
+        public Guid Id => this.id;
 
         /// <summary>
         /// Фамилия объекта Сотрудник
@@ -124,7 +124,7 @@ namespace HRM
         /// <param name="guid">Гуид объекта Сотрудник</param>
         public Employee( string lname, string name, Guid deptGuid, Guid guid )
         {
-            this.emplguid = ( guid == Guid.Empty ) ? Guid.NewGuid() : guid;
+            this.id = ( guid == Guid.Empty ) ? Guid.NewGuid() : guid;
             LastName = lname;
             Name = name;
             Department = ( deptGuid == Guid.Empty ) ? null : Department.GetDepartmentByGuid( deptGuid );
@@ -163,7 +163,7 @@ namespace HRM
         /// <summary>
         /// Гуид объекта Отдел
         /// </summary>
-        private Guid deptguid;
+        private Guid id;
 
         /// <summary>
         /// Наименование объекта Отдела
@@ -173,7 +173,7 @@ namespace HRM
         /// <summary>
         /// Гуид объекта Отдел
         /// </summary>
-        public Guid DepartmentGuid => this.deptguid;
+        public Guid Id => this.id;
 
         /// <summary>
         /// Наименование объекта Отдел
@@ -212,7 +212,7 @@ namespace HRM
         /// <param name="guid">Гуид отдела</param>
         public Department( string name, Guid guid )
         {
-            this.deptguid = ( guid == Guid.Empty ) ? Guid.NewGuid() : guid;
+            this.id = ( guid == Guid.Empty ) ? Guid.NewGuid() : guid;
             Name = name;
 
             //добавляем в общую коллекцию
@@ -226,7 +226,7 @@ namespace HRM
         /// <returns>объект Отдел</returns>
         public static Department GetDepartmentByGuid( Guid guid )
         {
-            Department d = Departments.First( x => x.DepartmentGuid == guid );
+            Department d = Departments.First( x => x.id == guid );
 
             if (d == null)
             {

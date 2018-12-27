@@ -52,7 +52,7 @@ namespace HRM
 
             if (CurrentEmployee == null) // если пустой - создаем нового сотрудника
             {
-                CurrentEmployee = new Employee( tbLName.Text, tbName.Text, ((Department)cbDepartment.SelectedItem == null) ? Guid.Empty : ((Department)cbDepartment.SelectedItem).DepartmentGuid );
+                CurrentEmployee = new Employee( tbLName.Text, tbName.Text, ((Department)cbDepartment.SelectedItem == null) ? Guid.Empty : ((Department)cbDepartment.SelectedItem).Id );
             }
             else
             {

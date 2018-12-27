@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
-
 
 namespace HRM
 {
@@ -16,33 +16,46 @@ namespace HRM
         /// <summary>
         /// генерация Отделов
         /// </summary>
-        static void DeptsLoad()
+        static Department[] DeptsLoad()
         {
-            new Department( "Администрация", Guid.Parse( "D772844B-07DC-4DC1-B4BC-D168699BB0B4" ) );
-            new Department( "Бухгалтерия", Guid.Parse( "1134BC2A-8406-4503-A401-BD5B94C936DB" ) );
-            new Department( "Цех №1", Guid.Parse( "50D15AB8-9A12-4AA0-8FBF-BF3EE662F0D6" ) );
-            new Department( "Цех №2", Guid.Parse( "94CD5301-BD0A-4BBF-BF33-1A9DCC2F3D3E" ) );
+            Department[] d =
+                {
+
+                new Department( "Администрация", Guid.Parse( "D772844B-07DC-4DC1-B4BC-D168699BB0B4" ) ),
+                new Department( "Бухгалтерия", Guid.Parse( "1134BC2A-8406-4503-A401-BD5B94C936DB" ) ),
+                new Department( "Цех №1", Guid.Parse( "50D15AB8-9A12-4AA0-8FBF-BF3EE662F0D6" ) ),
+                new Department( "Цех №2", Guid.Parse( "94CD5301-BD0A-4BBF-BF33-1A9DCC2F3D3E" ) )
+            };
+
+            return d;
         }
 
         /// <summary>
         /// генерация Сотрудников
         /// </summary>
-        static void EmplLoad()
+        static Employee[] EmplLoad()
         {
-            new Employee( "Иванов", "Иван", Guid.Parse( "D772844B-07DC-4DC1-B4BC-D168699BB0B4" ) );
-            new Employee( "Сидоров", "Сидор", Guid.Parse( "D772844B-07DC-4DC1-B4BC-D168699BB0B4" ) );
-            new Employee( "Петров", "Петр", Guid.Parse( "50D15AB8-9A12-4AA0-8FBF-BF3EE662F0D6" ) );
-            new Employee( "Кузин", "Юрий", Guid.Parse( "94CD5301-BD0A-4BBF-BF33-1A9DCC2F3D3E" ) );
-            new Employee( "Миронова", "Анастасия", Guid.Parse( "1134BC2A-8406-4503-A401-BD5B94C936DB" ) );
+            Employee[] em = {
+
+            new Employee( "Иванов", "Иван", Guid.Parse( "D772844B-07DC-4DC1-B4BC-D168699BB0B4" ) ),
+            new Employee( "Сидоров", "Сидор", Guid.Parse( "D772844B-07DC-4DC1-B4BC-D168699BB0B4" ) ),
+            new Employee( "Петров", "Петр", Guid.Parse( "50D15AB8-9A12-4AA0-8FBF-BF3EE662F0D6" ) ),
+            new Employee( "Кузин", "Юрий", Guid.Parse( "94CD5301-BD0A-4BBF-BF33-1A9DCC2F3D3E" ) ),
+            new Employee( "Миронова", "Анастасия", Guid.Parse( "1134BC2A-8406-4503-A401-BD5B94C936DB" ) )
+            };
+
+            return em;
+
         }
+
 
         /// <summary>
         /// инициализация - загрузка данных
         /// </summary>
         public static void Init()
         {
-            DataLayer.DeptsLoad();
-            DataLayer.EmplLoad();
+            //DataLayer.DeptsLoad();
+            //DataLayer.EmplLoad();
         }
 
         /// <summary>
@@ -51,8 +64,8 @@ namespace HRM
         /// <param name="d">ссылка на Отдел</param>
         public static void DepartmentCascadeDelete( ref Department d )
         {
-            Guid guid = d.DepartmentGuid;
-            Employee[] emplArray = Employee.Employees.Where( x => x.Department.DepartmentGuid == guid ).ToArray();
+            Guid guid = d.Id;
+            Employee[] emplArray = Employee.Employees.Where( x => x.Department.Id == guid ).ToArray();
 
             foreach (Employee item in emplArray)
             {
@@ -71,6 +84,11 @@ namespace HRM
             Employee.Employees.Remove( e );
         }
 
+        /// <summary>
+        /// создает подключение (SqlConnection) к базе данных
+        /// </summary>
+        /// <param name="except">перехваченное исключение</param>
+        /// <returns>объект типа SqlConnection</returns>
         public static SqlConnection GetSqlConnection( out Exception except )
         {
             ConnectionStringSettings settings = ConfigurationManager.ConnectionStrings["HRM"];
@@ -87,21 +105,23 @@ namespace HRM
                 except = ex;
                 sqlCon = null;
             }
-
             return sqlCon;
         }
 
-        public static bool Dept_CreateTable( out Exception except )
+        /// <summary>
+        /// создать в БД таблицу Departments
+        /// </summary>
+        /// <param name="except">перехваченное исключение</param>
+        public static void Dept_CreateTable( out Exception except )
         {
             using (SqlConnection sqlCon = GetSqlConnection( out Exception except_GetSqlConnection ))
             {
                 if (sqlCon == null)
                 {
                     except = except_GetSqlConnection;
-                    return false;
                 }
                 else
-                { 
+                {
                     string createExp = @"CREATE TABLE[dbo].[Departments](
                                     [Id]   UNIQUEIDENTIFIER NOT NULL,
                                     [Name] NCHAR(20)       NOT NULL,
@@ -116,37 +136,37 @@ namespace HRM
                     catch (Exception ex)
                     {
                         except = ex;
-                        return false;
                     }
-
                     except = null;
-                    return true;
                 }
             }
         }
 
-        public static bool Emp_CreateTable( out Exception except )
+        /// <summary>
+        /// создать в БД таблицу Employees
+        /// </summary>
+        /// <param name="except">перехваченное исключение</param>
+        public static void Emp_CreateTable( out Exception except )
         {
             using (SqlConnection sqlCon = GetSqlConnection( out Exception except_GetSqlConnection ))
             {
                 if (sqlCon == null)
                 {
                     except = except_GetSqlConnection;
-                    return false;
                 }
                 else
                 {
-                    string createExp = @"CREATE TABLE[dbo].[Employyees]
+                    string createExp = @"CREATE TABLE Employees
                                         (
                                         [Id] UNIQUEIDENTIFIER NOT NULL,
-                                        [LasName] NCHAR(50)       NOT NULL,
+                                        [LastName] NCHAR(50)       NOT NULL,
                                         [Name]         NCHAR(50)       NOT NULL,
                                         [DepartmentId] UNIQUEIDENTIFIER NOT NULL,
                                         PRIMARY KEY CLUSTERED( [Id] ASC)
                                         );
-                                        ALTER TABLE[dbo].[Employyees]
+                                        ALTER TABLE Employees
                                         WITH NOCHECK
-                                        ADD CONSTRAINT[DepartmentId] FOREIGN KEY( [Id]) REFERENCES[dbo].[Departments] ([Id]);";
+                                        ADD CONSTRAINT FK_DepartmentId FOREIGN KEY(DepartmentId) REFERENCES Departments (Id);";
 
                     try
                     {
@@ -157,11 +177,92 @@ namespace HRM
                     catch (Exception ex)
                     {
                         except = ex;
-                        return false;
                     }
-
                     except = null;
-                    return true;
+                }
+            }
+        }
+
+        /// <summary>
+        ///  заполнить таблицу Departments тестовыми данными
+        /// </summary>
+        /// <param name="except">перехваченное исключение</param>
+        public static void Dept_InsertDemoData( out Exception except )
+        {
+            using (SqlConnection sqlCon = GetSqlConnection( out Exception except_GetSqlConnection ))
+            {
+                if (sqlCon == null)
+                {
+                    except = except_GetSqlConnection;
+                }
+                else
+                {
+                    string insertExp = @"INSERT INTO Departments (Id, Name) VALUES(@Id, @Name);";
+                    SqlCommand sqlCom = new SqlCommand( insertExp, sqlCon );
+
+                    Department[] depts = DeptsLoad();
+
+                    try
+                    {
+                        sqlCon.Open();
+
+                        foreach (Department item in depts)
+                        {
+                            sqlCom.Parameters.Clear();
+                            sqlCom.Parameters.AddWithValue( "@Id", item.Id );
+                            sqlCom.Parameters.AddWithValue( "@Name", item.Name );
+
+                            int res = sqlCom.ExecuteNonQuery();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        except = ex;
+                    }
+                    except = null;
+                }
+            }
+        }
+
+        /// <summary>
+        ///  заполнить таблицу Employees тестовыми данными
+        /// </summary>
+        /// <param name="except">перехваченное исключение</param>
+        public static void Empl_InsertDemoData( out Exception except )
+        {
+            using (SqlConnection sqlCon = GetSqlConnection( out Exception except_GetSqlConnection ))
+            {
+                if (sqlCon == null)
+                {
+                    except = except_GetSqlConnection;
+                }
+                else
+                {
+                    string insertExp = @"INSERT INTO Employees (Id, LastName, Name, DepartmentId) VALUES(@Id, @LastName, @Name, @DepartmentId);";
+                    SqlCommand sqlCom = new SqlCommand( insertExp, sqlCon );
+
+                    Employee[] empls = EmplLoad();
+
+                    try
+                    {
+                        sqlCon.Open();
+
+                        foreach (Employee item in empls)
+                        {
+                            sqlCom.Parameters.Clear();
+                            sqlCom.Parameters.AddWithValue( "@Id", item.Id );
+                            sqlCom.Parameters.AddWithValue( "@LastName", item.LastName );
+                            sqlCom.Parameters.AddWithValue( "@Name", item.Name );
+                            sqlCom.Parameters.AddWithValue( "@DepartmentId", item.Department.Id );
+
+                            int res = sqlCom.ExecuteNonQuery();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        except = ex;
+                    }
+                    except = null;
                 }
             }
         }
