@@ -13,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Data;
+
 
 namespace HRM
 {
@@ -172,16 +174,6 @@ namespace HRM
             if (em != null) Employee_Edit_WindowOpen( ref em );
         }
 
-        /// <summary>
-        /// обработка события смена выбранной строки списка объектов Отдел
-        /// </summary>
-        /// <param name="sender">объект-поставщик события</param>
-        /// <param name="e">параметры события</param>
-        private void DeptList_SelectionChanged( object sender, SelectionChangedEventArgs e )
-        {
-            //EmployeesList_Refresh();
-        }
-
         private void BtDeptDel_Click( object sender, RoutedEventArgs e )
         {
             Department d = (Department)DeptList.SelectedItem;
@@ -227,31 +219,105 @@ namespace HRM
         {
             DataLayer.Dept_CreateTable( out Exception ex );
 
-            if ( ex != null ) MessageBox.Show( ex.Message );
+            if (ex != null) MessageBox.Show( ex.Message );
             else MessageBox.Show( "Создана таблица Departments" );
 
             DataLayer.Emp_CreateTable( out Exception ex1 );
 
-            if ( ex1 != null ) MessageBox.Show( ex1.Message );
+            if (ex1 != null) MessageBox.Show( ex1.Message );
             else MessageBox.Show( "Создана таблица Employees" );
+
+            CheckTablesExists( true );
         }
 
         private void btFillDemoBase_Click( object sender, RoutedEventArgs e )
         {
             DataLayer.Dept_InsertDemoData( out Exception ex );
 
-            if ( ex != null) MessageBox.Show( ex.Message );
+            if (ex != null) MessageBox.Show( ex.Message );
             else MessageBox.Show( "Заполнена таблица Departments" );
 
             DataLayer.Empl_InsertDemoData( out Exception ex1 );
 
-            if ( ex1 != null ) MessageBox.Show( ex1.Message );
+            if (ex1 != null) MessageBox.Show( ex1.Message );
             else MessageBox.Show( "Заполнена таблица Employees" );
         }
 
+        /// <summary>
+        /// событие - загрузка окна
+        /// </summary>
+        /// <param name="sender">объект-источник события</param>
+        /// <param name="e">параметры события</param>
         private void Window_Loaded( object sender, RoutedEventArgs e )
         {
-            DeptList.DataContext = DataLayer.GetDataTable_Dept( out Exception ex )?.DefaultView;
+            if (!(CheckTablesExists()))
+            {
+                return;
+            }
+            else
+            {
+                DataSet ds = DataLayer.GetDataSet_DepartmentsAndEmployees( out Exception exception );
+
+                if (exception == null)
+                {
+                    DeptList.DataContext = ds.Tables["Departments"];
+                    EmployeesList.DataContext = ds.Tables["Departments"];
+                    
+                }
+                else
+                {
+                    MessageBox.Show( exception.Message );
+                }
+            }
+        }
+
+        /// <summary>
+        /// проверка существования таблиц в БД + реакция gui на существование
+        /// </summary>
+        /// <param name="mute">не сообщать о результате проверки пользователю</param>
+        /// <returns>таблицы существует/не существует</returns>
+        private bool CheckTablesExists(bool mute = false)
+        {
+            bool res = true;
+
+            if (!( TableExist( "Departments", mute ) && TableExist( "Employees", mute ) )) res = false;
+
+            ItemsButtonsOnOff( res );
+
+            return res;
+        }
+
+        /// <summary>
+        /// проверка существования таблицы в БД
+        /// </summary>
+        /// <param name="tName">имя таблицы</param>
+        /// /// <param name="mute">сообщать пользователю что таблицы нет</param>
+        /// <returns>таблица существует/не существует</returns>
+        private bool TableExist( string tName, bool mute )
+        {
+            bool tableExist = DataLayer.CheckTableExist( tName, out Exception exceptionD );
+
+            if (exceptionD != null)
+            {
+                MessageBox.Show( exceptionD.Message );
+                return false;
+            }
+            else
+            {
+                if ((!( mute ) ) && !( tableExist )) MessageBox.Show( $"Таблица: {tName} не найдена в базе данных!", "Ошибка:", MessageBoxButton.OK, MessageBoxImage.Error );
+            }
+
+            return tableExist;
+        }
+
+        /// <summary>
+        /// включить/выключить доступность кнопок редактирования отделов и сотрудников
+        /// </summary>
+        /// <param name="btEnable">вкл/выкл</param>
+        private void ItemsButtonsOnOff( bool btEnable )
+        {
+            grDepts.IsEnabled = btEnable;
+            grEmps.IsEnabled = btEnable;
         }
     }
 }
