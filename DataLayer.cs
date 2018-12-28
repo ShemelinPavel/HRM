@@ -267,7 +267,34 @@ namespace HRM
             }
         }
 
-        public static DataTable GetDataTable_Dept( out Exception except )
+        public static bool CheckTableExist( string tableName,  out Exception except )
+        {
+            using (SqlConnection sqlCon = GetSqlConnection( out Exception except_GetSqlConnection ))
+            {
+
+                if (sqlCon == null)
+                {
+                    except = except_GetSqlConnection;
+                    return false;
+                }
+                else
+                {
+                    SqlCommand sqlCom = new SqlCommand( $@"IF EXISTS( SELECT 1
+                                                        FROM INFORMATION_SCHEMA.TABLES
+                                                        WHERE TABLE_TYPE = 'BASE TABLE'
+                                                        AND TABLE_NAME = '{tableName}' )
+                                                        SELECT 1 AS res ELSE SELECT 0 AS res;", sqlCon );
+
+                    sqlCon.Open();
+                    int result = (int)sqlCom.ExecuteScalar();
+
+                    except = null;
+                    return (result == 1)? true: false;
+                }
+            }
+        }
+
+        public static DataSet GetDataSet_DepartmentsAndEmployees ( out Exception except )
         {
             using (SqlConnection sqlCon = GetSqlConnection( out Exception except_GetSqlConnection ))
             {
@@ -279,14 +306,23 @@ namespace HRM
                 }
                 else
                 {
-                    SqlDataAdapter adapter = new SqlDataAdapter();
-                    SqlCommand command = new SqlCommand( "SELECT ID, Name FROM Departments", sqlCon );
-                    adapter.SelectCommand = command;
-                    DataTable dt = new DataTable();
-                    adapter.Fill( dt );
+                    sqlCon.Open();
+
+                    SqlCommand cmd = new SqlCommand( "SELECT ID, Name FROM Departments ORDER BY Name ASC", sqlCon );
+
+                    SqlDataAdapter adapter = new SqlDataAdapter( cmd );
+
+                    DataSet ds = new DataSet();
+                    adapter.Fill( ds, "Departments" );
+                    cmd.CommandText = "SELECT ID, LastName, Name, DepartmentId FROM Employees";
+                    adapter.Fill( ds, "Employees" );
+
+                    //отношения между таблицами
+                    DataRelation relDeptsEmps = new DataRelation( "DeptsEmpsRelation", ds.Tables["Departments"].Columns["Id"], ds.Tables["Employees"].Columns["DepartmentId"] );
+                    ds.Relations.Add( relDeptsEmps );
 
                     except = null;
-                    return dt;
+                    return ds;
                 }
             }
         }
