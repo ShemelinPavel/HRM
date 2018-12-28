@@ -17,7 +17,7 @@
             <ColumnDefinition Width="40*"/>
             <ColumnDefinition Width="60*"/>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="DeptList" Margin="10" SelectionMode="Single" MouseDoubleClick="DeptList_MouseDoubleClick" SelectionChanged="DeptList_SelectionChanged" ItemsSource="{Binding Mode=OneWay}" Grid.Row="1" Padding="0">
+        <ListView x:Name="DeptList" Margin="10" SelectionMode="Single" MouseDoubleClick="DeptList_MouseDoubleClick" ItemsSource="{Binding Mode=OneWay}" Grid.Row="1" Padding="0" IsSynchronizedWithCurrentItem="True">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Наименование">
@@ -46,24 +46,16 @@
             </ListView.View>
         </ListView>
         <Label Content="Список отделов:" Margin="10,10,10,0" VerticalAlignment="Top" Height="26"/>
-        <ListView x:Name="EmployeesList" Grid.Column="1" Margin="10" MouseDoubleClick="EmployeesList_MouseDoubleClick" ItemsSource="{Binding Mode=OneWay}" SelectionMode="Single" Grid.Row="1">
+        <ListView x:Name="EmployeesList" Grid.Column="1" Margin="10" MouseDoubleClick="EmployeesList_MouseDoubleClick" SelectionMode="Single" Grid.Row="1" ItemsSource="{Binding DeptsEmpsRelation}" IsSynchronizedWithCurrentItem="True">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding LastName}" Header="Фамилия" Width="190"/>
                     <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Имя" Width="120"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Department.Name}" Header="Отдел" Width="130"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding DepartmentId}" Header="Отдел" Width="130"/>
                 </GridView>
             </ListView.View>
         </ListView>
-        
-        <Grid Margin="58,235,134,66" Grid.Row="1" Grid.IsSharedSizeScope="True" Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-        </Grid>
-        <Grid Margin="10,5" Grid.Row="2">
+        <Grid x:Name="grDepts" Margin="10,5" Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -71,10 +63,10 @@
             </Grid.ColumnDefinitions>
             <Button x:Name="btDeptNew" Content="Создать новый" Click="BtnDeptNew_Click" Margin="5" Padding="1"/>
             <Button x:Name="btDeptEdit" Content="Редактировать" Click="BtDeptEdit_Click" Padding="0,1" Margin="5" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Column="1"/>
-            <Button x:Name="btDeptDel" Content="Удалить" Click="BtDeptDel_Click" Margin="5" DockPanel.Dock="Right" Grid.Column="2"/>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="1,0" Grid.ColumnSpan="3" CornerRadius="2"/>
+            <Button x:Name="btDeptDel" Content="Удалить" Click="BtDeptDel_Click" Margin="5" Grid.Column="2" Grid.ColumnSpan="2"/>
+            <Border BorderBrush="Black" BorderThickness="1" Margin="1,0" Grid.ColumnSpan="4" CornerRadius="2"/>
         </Grid>
-        <Grid Grid.Column="1" Margin="10,5" Grid.Row="2">
+        <Grid x:Name="grEmps" Grid.Column="1" Margin="10,5" Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
