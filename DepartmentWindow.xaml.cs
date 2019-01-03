@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Data;
 
 namespace HRM
 {
@@ -25,37 +26,15 @@ namespace HRM
         private bool Modify;
 
         /// <summary>
-        /// текущий Отдел
-        /// </summary>
-        public Department CurrentDepartment { get; set; }
-
-        /// <summary>
         /// конструктор формы редактирования объекта Отдел
         /// </summary>
         /// <param name="dept">ссылка на существующий Отдел</param>
-        public DepartmentWindow( ref Department dept )
+        public DepartmentWindow( ref DataRowView dept )
         {
             InitializeComponent();
-
-            CurrentDepartment = dept;
-
-            tbName.DataContext = CurrentDepartment;
-        }
-
-        /// <summary>
-        /// сохраняем изменения текущего объекта Отдел
-        /// </summary>
-        private void CurrentDepartmentSave()
-        {
-
-            if (CurrentDepartment == null) // если пустой - создаем новый отдел
-            {
-                CurrentDepartment = new Department( tbName.Text );
-            }
-            else
-            {
-                CurrentDepartment.Name = tbName.Text;
-            }
+  
+            if (dept.IsNew) dept.Row[0] = Guid.NewGuid();
+            this.DataContext = dept;
         }
 
         /// <summary>
@@ -65,8 +44,8 @@ namespace HRM
         /// <param name="e">параметры события</param>
         private void BtSave_Click( object sender, RoutedEventArgs e )
         {
-            CurrentDepartmentSave();
             Modify = false;
+            this.DialogResult = true;
         }
 
         /// <summary>
@@ -80,7 +59,8 @@ namespace HRM
             {
                 MessageBoxResult userAns = MessageBox.Show(this,  "Сохранить изменения?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes );
 
-                if (userAns == MessageBoxResult.Yes) CurrentDepartmentSave();
+                if (userAns == MessageBoxResult.Yes) this.DialogResult = true;
+                else DialogResult = false;
             }
             this.Close();
         }
