@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data;
+using System.Data.SqlClient;
 
 
 namespace HRM
@@ -32,74 +33,43 @@ namespace HRM
         }
 
         /// <summary>
-        /// добавить Отдел в список
-        /// </summary>
-        /// <param name="d">ссылка на добавляемый Отдел</param>
-        private void DepartmentAdd( Department d )
-        {
-            if (d != null && ( !( DeptList.Items.Contains( d ) ) ))
-            {
-                ( (ObservableCollection<Department>)DeptList.ItemsSource ).Add( d );
-            }
-        }
-
-        /// <summary>
-        /// добавить Сотрудник в список
-        /// </summary>
-        /// <param name="d">ссылка на добавляемого Сотрудника</param>
-        private void EmployeeAdd( Employee e )
-        {
-            if (e != null && ( !( EmployeesList.Items.Contains( e ) ) ))
-            {
-                ( (ObservableCollection<Employee>)EmployeesList.ItemsSource ).Add( e );
-            }
-        }
-
-        /// <summary>
         /// открыть форму редактирования отдела
         /// </summary>
-        /// <param name="d">ссылка на существующий отдел</param>
-        private void Department_Edit_WindowOpen( ref Department d )
+        /// <param name="drv">ссылка на существующий отдел</param>
+        private void Department_Edit_WindowOpen( ref DataRowView drv )
         {
-            DepartmentWindow win = new DepartmentWindow( ref d ) { Owner = this };
-            win.Closed += Department_Edit_WindowClosed;
-            win.ShowDialog();
+            DepartmentWindow win = new DepartmentWindow( ref drv ) { Owner = this };
+            Nullable<bool> res = win.ShowDialog();
+
+            if (res.HasValue && res == true)
+            {
+                Exception exception = null;
+
+                drv.EndEdit();
+                DataLayer.Dept_SaveTable( ( (DataView)DeptList.DataContext ).Table, out exception );
+
+                if (!( exception == null )) MessageBox.Show( exception.Message );
+            }
         }
 
         /// <summary>
         /// открыть форму редактирования сотрудника
         /// </summary>
         /// <param name="e">ссылка на существующего сотрудника</param>
-        private void Employee_Edit_WindowOpen( ref Employee e )
+        private void Employee_Edit_WindowOpen( ref DataRowView drv )
         {
-            EmployeeWindow win = new EmployeeWindow( ref e ) { Owner = this };
-            win.Closed += Employee_Edit_WindowClosed;
-            win.ShowDialog();
-        }
+            EmployeeWindow win = new EmployeeWindow( ref drv ) { Owner = this };
+            Nullable<bool> res = win.ShowDialog();
 
+            if (res.HasValue && res == true)
+            {
+                Exception exception = null;
 
-        /// <summary>
-        /// обработка события - закрытие формы редактирование объекта Отдел
-        /// </summary>
-        /// <param name="sender">объект-поставщик события</param>
-        /// <param name="e">параметры события</param>
-        private void Department_Edit_WindowClosed( object sender, EventArgs e )
-        {
-            Department curDept = ( (DepartmentWindow)sender ).CurrentDepartment;
+                drv.EndEdit();
+                DataLayer.Emp_SaveTable( ( (DataView)EmployeesList.ItemsSource ).Table, out exception );
 
-            DepartmentAdd( curDept );
-        }
-
-        /// <summary>
-        /// обработка события - закрытие формы редактирование объекта Сотрудник
-        /// </summary>
-        /// <param name="sender">объект-поставщик события</param>
-        /// <param name="e">параметры события</param>
-        private void Employee_Edit_WindowClosed( object sender, EventArgs e )
-        {
-            Employee curEmpl = ( (EmployeeWindow)sender ).CurrentEmployee;
-
-            EmployeeAdd( curEmpl );
+                if (!( exception == null )) MessageBox.Show( exception.Message );
+            }
         }
 
         /// <summary>
@@ -109,9 +79,13 @@ namespace HRM
         /// <param name="e">параметры события</param>
         private void BtnDeptNew_Click( object sender, RoutedEventArgs e )
         {
-            Department d = null;
+            DataView dv = DeptList.DataContext as DataView;
+            DataRowView drv = dv.AddNew();
+            drv.BeginEdit();
 
-            Department_Edit_WindowOpen( ref d );
+            Department_Edit_WindowOpen( ref drv );
+
+            DataRefresh();
         }
 
         /// <summary>
@@ -121,9 +95,13 @@ namespace HRM
         /// <param name="e">параметры события</param>
         private void BtEmplNew_Click( object sender, RoutedEventArgs e )
         {
-            Employee em = null;
+            DataView dv = EmployeesList.ItemsSource as DataView;
+            DataRowView drv = dv.AddNew();
+            drv.BeginEdit();
 
-            Employee_Edit_WindowOpen( ref em );
+            Employee_Edit_WindowOpen( ref drv );
+
+            DataRefresh();
         }
 
         /// <summary>
@@ -133,9 +111,9 @@ namespace HRM
         /// <param name="e">параметры события</param>
         private void BtDeptEdit_Click( object sender, RoutedEventArgs e )
         {
-            Department d = (Department)DeptList.SelectedItem;
-
-            Department_Edit_WindowOpen( ref d );
+            DataRowView drv = (DataRowView)DeptList.SelectedItem;
+            drv.BeginEdit();
+            Department_Edit_WindowOpen( ref drv );
         }
 
         /// <summary>
@@ -145,9 +123,9 @@ namespace HRM
         /// <param name="e">параметры события</param>
         private void BtEmplEdit_Click( object sender, RoutedEventArgs e )
         {
-            Employee em = (Employee)EmployeesList.SelectedItem;
-
-            Employee_Edit_WindowOpen( ref em );
+            DataRowView drv = (DataRowView)EmployeesList.SelectedItem;
+            drv.BeginEdit();
+            Employee_Edit_WindowOpen( ref drv );
         }
 
         /// <summary>
@@ -157,9 +135,9 @@ namespace HRM
         /// <param name="e"></param>
         private void DeptList_MouseDoubleClick( object sender, MouseButtonEventArgs e )
         {
-            Department d = (Department)DeptList.SelectedItem;
+            DataRowView drv = (DataRowView)DeptList.SelectedItem;
 
-            if (d != null) Department_Edit_WindowOpen( ref d );
+            if (drv != null) Department_Edit_WindowOpen( ref drv );
         }
 
         /// <summary>
@@ -169,52 +147,50 @@ namespace HRM
         /// <param name="e">параметры события</param>
         private void EmployeesList_MouseDoubleClick( object sender, MouseButtonEventArgs e )
         {
-            Employee em = (Employee)EmployeesList.SelectedItem;
+            DataRowView drv = EmployeesList.SelectedItem as DataRowView;
 
-            if (em != null) Employee_Edit_WindowOpen( ref em );
+            if (drv != null) Employee_Edit_WindowOpen( ref drv );
         }
 
+        /// <summary>
+        /// событие удаление объекта Отдел
+        /// </summary>
+        /// <param name="sender">объект-поставщик события</param>
+        /// <param name="e">параметры события</param>
         private void BtDeptDel_Click( object sender, RoutedEventArgs e )
         {
-            Department d = (Department)DeptList.SelectedItem;
-            int dIndex = DeptList.Items.IndexOf( d );
+            DataRowView drv = DeptList.SelectedItem as DataRowView;
 
-            if (d != null)
+            MessageBoxResult userAus = MessageBox.Show( this, "Удаление отдела приведет к удалению всех сортудников в нем.\nПродолжить удаление?", "Предупреждение:", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes );
+            if (userAus == MessageBoxResult.Yes)
             {
-                int emplCount = Employee.Employees.Count( x => x.Department == d );
+                drv.Delete();
+                DataLayer.Dept_SaveTable( ( (DataView)DeptList.DataContext ).Table, out Exception exception );
 
-                if (emplCount != 0)
-                {
-                    string t = ( emplCount == 1 ) ? "сотрудника" : "сотрудников";
-                    MessageBoxResult userAns = MessageBox.Show( this, $"Данный отдел <{d.Name}> указан у {emplCount} {t}.\nУдаление отдела приведет к удалению данных сотрудников.\nПродолжить удаление?", "Предупреждение", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes );
-
-                    if (userAns == MessageBoxResult.No)
-                    {
-                        return;
-                    }
-                }
-                DataLayer.DepartmentCascadeDelete( ref d );
-
-                if (DeptList.Items.Count - 1 < dIndex) dIndex--;
-                if (dIndex >= 0) DeptList.SelectedItem = DeptList.Items[dIndex];
+                if (!( exception == null )) MessageBox.Show( exception.Message );
             }
         }
 
+        /// <summary>
+        /// событие удаление объекта Сотрудник
+        /// </summary>
+        /// <param name="sender">объект-поставщик события</param>
+        /// <param name="e">параметры события</param>
         private void BtEmplDel_Click( object sender, RoutedEventArgs e )
         {
-            Employee em = (Employee)EmployeesList.SelectedItem;
-            int dIndex = EmployeesList.Items.IndexOf( em );
+            DataRowView drv = EmployeesList.SelectedItem as DataRowView;
 
-            if (em != null)
-            {
-                DataLayer.EmployeeDelete( ref em );
-                //EmployeesList_Refresh();
+            drv.Delete();
+            DataLayer.Emp_SaveTable( ( (DataView)EmployeesList.ItemsSource ).Table, out Exception exception );
 
-                if (EmployeesList.Items.Count - 1 < dIndex) dIndex--;
-                if (dIndex >= 0) EmployeesList.SelectedItem = EmployeesList.Items[dIndex];
-            }
+            if (!( exception == null )) MessageBox.Show( exception.Message );
         }
 
+        /// <summary>
+        /// создание таблиц в БД
+        /// </summary>
+        /// <param name="sender">объект-источник события</param>
+        /// <param name="e">параметры события</param>
         private void btCreateBaseTables_Click( object sender, RoutedEventArgs e )
         {
             DataLayer.Dept_CreateTable( out Exception ex );
@@ -230,6 +206,11 @@ namespace HRM
             CheckTablesExists( true );
         }
 
+        /// <summary>
+        /// заполнение БД демонстрационными данными
+        /// </summary>
+        /// <param name="sender">объект-источник события</param>
+        /// <param name="e">параметры события</param>
         private void btFillDemoBase_Click( object sender, RoutedEventArgs e )
         {
             DataLayer.Dept_InsertDemoData( out Exception ex );
@@ -250,24 +231,32 @@ namespace HRM
         /// <param name="e">параметры события</param>
         private void Window_Loaded( object sender, RoutedEventArgs e )
         {
-            if (!(CheckTablesExists()))
+            if (!( CheckTablesExists() ))
             {
                 return;
             }
             else
             {
-                DataSet ds = DataLayer.GetDataSet_DepartmentsAndEmployees( out Exception exception );
+                DataRefresh();
+            }
+        }
 
-                if (exception == null)
-                {
-                    DeptList.DataContext = ds.Tables["Departments"];
-                    EmployeesList.DataContext = ds.Tables["Departments"];
-                    
-                }
-                else
-                {
-                    MessageBox.Show( exception.Message );
-                }
+        /// <summary>
+        /// обновление источников данных
+        /// </summary>
+        private void DataRefresh()
+        {
+            DataSet ds = DataLayer.GetDataSet_DepartmentsAndEmployees( out Exception exception );
+
+            if (exception == null)
+            {
+                DeptList.DataContext = ds.Tables["Departments"].DefaultView;
+                EmployeesList.DataContext = ds.Tables["Departments"].DefaultView;
+
+            }
+            else
+            {
+                MessageBox.Show( exception.Message );
             }
         }
 
@@ -276,7 +265,7 @@ namespace HRM
         /// </summary>
         /// <param name="mute">не сообщать о результате проверки пользователю</param>
         /// <returns>таблицы существует/не существует</returns>
-        private bool CheckTablesExists(bool mute = false)
+        private bool CheckTablesExists( bool mute = false )
         {
             bool res = true;
 
@@ -304,7 +293,7 @@ namespace HRM
             }
             else
             {
-                if ((!( mute ) ) && !( tableExist )) MessageBox.Show( $"Таблица: {tName} не найдена в базе данных!", "Ошибка:", MessageBoxButton.OK, MessageBoxImage.Error );
+                if (( !( mute ) ) && !( tableExist )) MessageBox.Show( $"Таблица: {tName} не найдена в базе данных!", "Ошибка:", MessageBoxButton.OK, MessageBoxImage.Error );
             }
 
             return tableExist;
