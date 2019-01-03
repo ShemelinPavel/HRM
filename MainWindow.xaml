@@ -46,12 +46,14 @@
             </ListView.View>
         </ListView>
         <Label Content="Список отделов:" Margin="10,10,10,0" VerticalAlignment="Top" Height="26"/>
-        <ListView x:Name="EmployeesList" Grid.Column="1" Margin="10" MouseDoubleClick="EmployeesList_MouseDoubleClick" SelectionMode="Single" Grid.Row="1" ItemsSource="{Binding DeptsEmpsRelation}" IsSynchronizedWithCurrentItem="True">
+        <ListView x:Name="EmployeesList" Margin="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" MouseDoubleClick="EmployeesList_MouseDoubleClick" SelectionMode="Single" Grid.Row="1" ItemsSource="{Binding DeptsEmpsRelation}" IsSynchronizedWithCurrentItem="True" Grid.Column="1">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding LastName}" Header="Фамилия" Width="190"/>
                     <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Имя" Width="120"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding DepartmentId}" Header="Отдел" Width="130"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding DepartmentsName}" Header="Отдел" Width="130">
+
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
