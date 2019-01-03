@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Data;
 
 namespace HRM
 {
@@ -25,41 +26,18 @@ namespace HRM
         private bool Modify;
 
         /// <summary>
-        /// текущий Сотрудник
-        /// </summary>
-        public Employee CurrentEmployee { get; set; }
-
-        /// <summary>
         /// конструктор Сотрудник
         /// </summary>
         /// <param name="em">ссылка на текущего сотрудника</param>
-        public EmployeeWindow( ref Employee em )
+        public EmployeeWindow( ref DataRowView em )
         {
             InitializeComponent();
 
-            CurrentEmployee = em;
+            if (em.IsNew) em.Row[0] = Guid.NewGuid();
 
-            this.DataContext = CurrentEmployee;
-            cbDepartment.DataContext = Department.Departments;
-            cbDepartment.SelectedItem = CurrentEmployee?.Department;
-        }
-
-        /// <summary>
-        /// сохраняем изменения текущего объекта Сотрудник
-        /// </summary>
-        private void CurrentEmployeeSave()
-        {
-
-            if (CurrentEmployee == null) // если пустой - создаем нового сотрудника
-            {
-                CurrentEmployee = new Employee( tbLName.Text, tbName.Text, ((Department)cbDepartment.SelectedItem == null) ? Guid.Empty : ((Department)cbDepartment.SelectedItem).Id );
-            }
-            else
-            {
-                CurrentEmployee.LastName = tbLName.Text;
-                CurrentEmployee.Name = tbName.Text;
-                CurrentEmployee.Department = (Department)cbDepartment.SelectedItem;
-            }
+            this.DataContext = em;
+            cbDepartment.DataContext = em.DataView.Table.DataSet.Tables["Departments"].DefaultView;
+            cbDepartment.SelectedValue = em.Row.ItemArray[3];
         }
 
         /// <summary>
@@ -73,10 +51,10 @@ namespace HRM
             {
                 MessageBoxResult userAns = MessageBox.Show( this, "Сохранить изменения?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes );
 
-                if (userAns == MessageBoxResult.Yes) CurrentEmployeeSave();
+                if (userAns == MessageBoxResult.Yes) this.DialogResult = true;
+                else DialogResult = false;
             }
             this.Close();
-
         }
 
         /// <summary>
@@ -86,8 +64,8 @@ namespace HRM
         /// <param name="e">параметры события</param>
         private void BtSave_Click( object sender, RoutedEventArgs e )
         {
-            CurrentEmployeeSave();
             Modify = false;
+            this.DialogResult = true;
         }
 
         /// <summary>
@@ -130,6 +108,7 @@ namespace HRM
         private void CbDepartment_SelectionChanged( object sender, SelectionChangedEventArgs e )
         {
             Modify = true;
+            ( (DataRowView)this.DataContext ).Row[3] = cbDepartment.SelectedValue;
         }
     }
 }
